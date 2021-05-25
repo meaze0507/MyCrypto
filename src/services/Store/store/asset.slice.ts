@@ -86,6 +86,7 @@ export const getAssetByUUID = (uuid: TUuid) =>
 
 // Temp alias to avoid renaming.
 export const selectAsset = getAssetByUUID;
+
 /**
  * Sagas
  */
