@@ -13,6 +13,7 @@ import {
   deleteMembership,
   fetchAssets,
   fetchMemberships,
+  getUserAssets,
   isMyCryptoMember,
   selectTxsByStatus,
   useDispatch,
@@ -103,7 +104,6 @@ export const StoreContext = createContext({} as State);
 export const StoreProvider: React.FC = ({ children }) => {
   const {
     accounts,
-    userAssets,
     addTxToAccount,
     removeTxFromAccount,
     getAccountByAddressAndNetworkName,
@@ -297,9 +297,7 @@ export const StoreProvider: React.FC = ({ children }) => {
     uniClaims,
     ensOwnershipRecords,
     isEnsFetched,
-    get userAssets() {
-      return userAssets;
-    },
+    userAssets: useSelector(getUserAssets),
     getDefaultAccount: (includeViewOnly?: boolean, networkId?: NetworkId) =>
       pipe(
         (a: StoreAccount[]) => getAccountsByNetwork(a, networkId),
