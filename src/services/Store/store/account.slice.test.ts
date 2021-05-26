@@ -1,7 +1,7 @@
 import { BigNumber } from '@ethersproject/bignumber';
 import { expectSaga, mockAppState } from 'test-utils';
 
-import { ETHUUID, REPV2UUID } from '@config';
+import { ETHUUID, REPV1UUID, REPV2UUID } from '@config';
 import {
   fAccount,
   fAccounts,
@@ -12,13 +12,14 @@ import {
   fTransaction,
   fTxReceipt
 } from '@fixtures';
-import { IAccount, ITxReceipt, ITxStatus, ITxType, TUuid } from '@types';
+import { IAccount, ISettings, ITxReceipt, ITxStatus, ITxType, TUuid, WalletId } from '@types';
 
 import {
   addTxToAccount,
   addTxToAccountWorker,
   getAccounts,
   getStoreAccounts,
+  getUserAssets,
   initialState,
   selectAccountTxs,
   selectCurrentAccounts,
@@ -150,6 +151,22 @@ describe('AccountSlice', () => {
     const actual = getStoreAccounts(state);
 
     expect(actual).toEqual([{ ...fAccounts[0], label: fContacts[1].label }]);
+  });
+
+  it('getUserAssets(): gets user accounts assets and filter excluded assets', () => {
+    const walletConnectAccount = fAccounts.filter((a) => a.wallet === WalletId.WALLETCONNECT)[0];
+    const viewOnlyAccount = fAccounts.filter((a) => a.wallet === WalletId.VIEW_ONLY)[0];
+
+    const state = mockAppState({
+      accounts: [sanitizeAccount(walletConnectAccount), sanitizeAccount(viewOnlyAccount)],
+      assets: fAssets,
+      networks: fNetworks,
+      addressBook: fContacts,
+      settings: { excludedAssets: [REPV1UUID] } as ISettings
+    });
+
+    const actual = getUserAssets(state);
+    expect(actual).toEqual(walletConnectAccount.assets.filter((a) => a.uuid !== REPV1UUID));
   });
 
   it('selectCurrentAccounts(): returns only favorite accounts', () => {

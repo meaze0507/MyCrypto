@@ -48,7 +48,7 @@ import {
   sortByLabel,
   useInterval
 } from '@utils';
-import { isEmpty, isEmpty as isVoid, pipe, prop, sortBy, uniqBy, useEffectOnce } from '@vendor';
+import { isEmpty, isEmpty as isVoid, pipe, useEffectOnce } from '@vendor';
 
 import { UniswapService } from '../ApiService';
 import { getDashboardAccounts, useAccounts } from './Account';
@@ -56,7 +56,7 @@ import { getNewDefaultAssetTemplateByNetwork, getTotalByAsset, useAssets } from 
 import { getAccountsAssetsBalances } from './BalanceService';
 import { useContacts } from './Contact';
 import { findMultipleNextUnusedDefaultLabels } from './Contact/helpers';
-import { getTxsFromAccount, isNotExcludedAsset } from './helpers';
+import { getTxsFromAccount } from './helpers';
 import { getNetworkById, useNetworks } from './Network';
 import { useSettings } from './Settings';
 
@@ -103,6 +103,7 @@ export const StoreContext = createContext({} as State);
 export const StoreProvider: React.FC = ({ children }) => {
   const {
     accounts,
+    userAssets,
     addTxToAccount,
     removeTxFromAccount,
     getAccountByAddressAndNetworkName,
@@ -297,12 +298,7 @@ export const StoreProvider: React.FC = ({ children }) => {
     ensOwnershipRecords,
     isEnsFetched,
     get userAssets() {
-      const userAssets = state.accounts
-        .filter((a: StoreAccount) => a.wallet !== WalletId.VIEW_ONLY)
-        .flatMap((a: StoreAccount) => a.assets)
-        .filter(isNotExcludedAsset(settings.excludedAssets));
-      const uniq = uniqBy(prop('uuid'), userAssets);
-      return sortBy(prop('ticker'), uniq);
+      return userAssets;
     },
     getDefaultAccount: (includeViewOnly?: boolean, networkId?: NetworkId) =>
       pipe(
